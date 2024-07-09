@@ -37,7 +37,7 @@ mod.crosshair_rotation = function(x, y, angle, half_crosshair_size, minimum_offs
 end
 
 --most templates multiply pitch and yaw by 10, and apply_fov_to_crosshair by 37. The result is 370 but needs to be 540, the number of pixels from center of crosshair to top of screen with a 1080p monitor.
-mod:hook(fov, "apply_fov_to_crosshair", function(func, pitch, yaw)
+mod:hook(fov, "apply_fov_to_crosshair", function(func, pitch, yaw) -- the fov conversion actually gets applied before "crosshair_settings.spread_scalar" but it's basically always 1 as far as I can tell. If this changes I'll need to fix it.
 	pitch, yaw = func(pitch, yaw)
 
 	local correction = 54/37
