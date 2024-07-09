@@ -2,6 +2,13 @@ local mod = get_mod("better_crosshairs")
 local fov = require("scripts/utilities/camera/fov")
 local assault_new = require("scripts/ui/hud/elements/crosshair/templates/crosshair_template_assault_new")
 local Crosshair = require("scripts/ui/utilities/crosshair")
+local HudElementCrosshairSettings = require("scripts/ui/hud/elements/crosshair/hud_element_crosshair_settings")
+
+local SCALAR = mod:get("crosshair_scalar")
+mod.on_setting_changed = function(status, state_name)
+    SCALAR = mod:get("crosshair_scalar")
+end
+
 --supplied with spread_offset_x and spread_offset_y and the angle of a crosshair segment, returns x and y coordinates adjusted for the rotation.
 --minimum_offset is the mininum number of 1080 pixels the returned x, y should be from center. e.g. a value of 1 at an angle of 45° would set a minumum x and y value of 0.707. optional
 --texture_rotation is an optional parameter in case the crosshair texture needs additional rotation. Be sure to also adjust the crosshair segment angles as needed. optional.
@@ -98,3 +105,12 @@ for i=1, #HudElementCrosshairSettings.templates do
 		Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
 	end)
 end
+
+mod:command("set_crosshair_scalar", mod:localize("crosshair_scalar_description"), function(s, ...)
+    s = tonumber(s)
+    if s == nil or s < 0.01 or s > 8 then
+        mod:error("Invalid")
+        return
+    end
+    mod:set("crosshair_scalar", s, true)
+end)
