@@ -1,10 +1,9 @@
 local mod = get_mod("better_crosshairs")
 local fov = require("scripts/utilities/camera/fov")
-local assault_new = require("scripts/ui/hud/elements/crosshair/templates/crosshair_template_assault_new")
 local Crosshair = require("scripts/ui/utilities/crosshair")
-local HudElementCrosshairSettings = require("scripts/ui/hud/elements/crosshair/hud_element_crosshair_settings")
 local HudElementCrosshair = require("scripts/ui/hud/elements/crosshair/hud_element_crosshair")
-
+local SPREAD_DISTANCE = 10
+local RIGHT_ANGLE = math.rad(90)
 local SCALAR = mod:get("crosshair_scalar")
 mod.on_setting_changed = function(status, state_name)
     SCALAR = mod:get("crosshair_scalar")
@@ -33,54 +32,28 @@ mod:hook(fov, "apply_fov_to_crosshair", function(func, pitch, yaw)
 	return pitch, yaw
 end)
 
---assault is the only template that has a multiplier of 15 instead of 10.
---I tried to fix this without hook_origin but I couldn't get it to work. Only thing this hook changes is SPREAD_DISTANCE 15 to 10
--- mod:hook_origin(assault_new, "update_function", function(parent, ui_renderer, widget, template, crosshair_settings, dt, t, draw_hit_indicator)
--- 	local style = widget.style
--- 	local hit_progress, hit_color, hit_weakspot = parent:hit_indicator()
--- 	local yaw, pitch = parent:_spread_yaw_pitch(dt)
+local crosshair_templates = {
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_assault_new",
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_cross_new",
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_projectile_drop_new"
+}
+for i=1, #crosshair_templates do
+	crosshair_templates[i] = require(crosshair_templates[i])
+end
 
--- 	if yaw and pitch then
--- 		local scalar = SPREAD_DISTANCE * (crosshair_settings.spread_scalar or 1)
--- 		local spread_offset_y = pitch * scalar
--- 		local spread_offset_x = yaw * scalar
+for i=1, #crosshair_templates do
+	mod:hook(crosshair_templates[i], "create_widget_defintion", function (func, template, scenegraph_id)
+		local widget = func(template, scenegraph_id)
+		local style = widget.style
+		local styles = {style.right, style.top, style.left, style.bottom}
+		for i=1, #styles do
+			if styles[i] then
+				styles[i].angle = math.rad(-90+90*i)
+			end
+		end
+		return widget
+	end)
 
--- 		local top_style = style.top
--- 		local top_size = top_style.size[1]
-
--- 		top_style.offset[1] = 0
--- 		top_style.offset[2] = math.min(-spread_offset_y - top_size/2, -top_size/2-2)
-
--- 		local bottom_style = style.bottom
--- 		local bottom_size = bottom_style.size[1]
-
--- 		bottom_style.offset[1] = 0
--- 		bottom_style.offset[2] = math.max(spread_offset_y + bottom_size/2, bottom_size/2+2)
-
--- 		local left_style = style.left
--- 		local left_size = left_style.size[1]
-
--- 		left_style.offset[1] = math.min(-spread_offset_x - left_size/2, -left_size/2-2)
--- 		left_style.offset[2] = 0
-
--- 		local right_style = style.right
--- 		local right_size = right_style.size[1]
-
--- 		right_style.offset[1] = math.max(spread_offset_x + right_size/2, right_size/2+2)
--- 		right_style.offset[2] = 0
--- 	end
-
--- 	Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
--- end)
-
-
-local SPREAD_DISTANCE = 10
-local HALF_SIZE_X = 4
-local MIN_OFFSET = 6
-local RIGHT_ANGLE = math.rad(90)
-local crosshair_templates = Script.new_array(#HudElementCrosshairSettings.templates)
-for i=1, #HudElementCrosshairSettings.templates do
-	crosshair_templates[i] = require(HudElementCrosshairSettings.templates[i])
 	mod:hook_origin(crosshair_templates[i], "update_function", function (parent, ui_renderer, widget, template, crosshair_settings, dt, t, draw_hit_indicator)
 		local style = widget.style
 		local hit_progress, hit_color, hit_weakspot = parent:hit_indicator()
@@ -94,11 +67,7 @@ for i=1, #HudElementCrosshairSettings.templates do
 			for k, v in pairs(style) do
 				local angle = v.angle
 				if not string.find(k, "hit_") and angle then
-					if name == "bfg" or name == "shotgun" or name == "spray_n_pray" then
-						v.offset[1], v.offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, angle, v.size[2]/2, 0, RIGHT_ANGLE)
-					else
-						v.offset[1], v.offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, angle, v.size[1]/2, 0)
-					end
+					v.offset[1], v.offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, angle, v.size[1]/2, v.size[2]/2)
 				end
 			end
 		end
@@ -107,23 +76,133 @@ for i=1, #HudElementCrosshairSettings.templates do
 	end)
 end
 
+local rotated_crosshair_templates = {
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_bfg_new",
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_shotgun_new",
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_spray_n_pray_new"
+}
+for i=1, #rotated_crosshair_templates do
+	rotated_crosshair_templates[i] = require(rotated_crosshair_templates[i])
+end
+
+for i=1, #rotated_crosshair_templates do
+	mod:hook(rotated_crosshair_templates[i], "create_widget_defintion", function (func, template, scenegraph_id)
+		local widget = func(template, scenegraph_id)
+		local style = widget.style
+		local styles = {style.right, style.top, style.left, style.bottom}
+		for i=1, #styles do
+			if styles[i] then
+				styles[i].angle = math.rad(-180+90*i)
+			end
+		end
+		return widget
+	end)
+
+	mod:hook_origin(rotated_crosshair_templates[i], "update_function", function (parent, ui_renderer, widget, template, crosshair_settings, dt, t, draw_hit_indicator)
+		local style = widget.style
+		local hit_progress, hit_color, hit_weakspot = parent:hit_indicator()
+		local yaw, pitch = parent:_spread_yaw_pitch(dt)
+		local name = template.name
+	
+		if yaw and pitch then
+			local scalar = SPREAD_DISTANCE * (crosshair_settings.spread_scalar or 1)
+			local spread_offset_y = pitch * scalar
+			local spread_offset_x = yaw * scalar
+			for k, v in pairs(style) do
+				local angle = v.angle
+				if not string.find(k, "hit_") and angle then
+					v.offset[1], v.offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, angle, v.size[2]/2, v.size[1]/2, RIGHT_ANGLE)
+				end
+			end
+		end
+	
+		Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
+	end)
+end
+
+local flamer = require("scripts/ui/hud/elements/crosshair/templates/crosshair_template_flamer")
+mod:hook(flamer, "create_widget_defintion", function (func, template, scenegraph_id)
+	local widget = func(template, scenegraph_id)
+	local style = widget.style
+	style.right.angle = math.rad(0) - RIGHT_ANGLE
+	style.left.angle = math.rad(180) - RIGHT_ANGLE
+	return widget
+end)
+mod:hook_origin(flamer, "update_function", function (parent, ui_renderer, widget, template, crosshair_settings, dt, t, draw_hit_indicator)
+	local style = widget.style
+	local hit_progress, hit_color, hit_weakspot = parent:hit_indicator()
+	local yaw, pitch = fov.apply_fov_to_crosshair(6, 6)
+
+	if yaw and pitch then
+		local scalar = SPREAD_DISTANCE * (crosshair_settings.spread_scalar or 1)
+		local spread_offset_y = pitch * scalar
+		local spread_offset_x = yaw * scalar
+		local styles = {style.right, style.left}
+		for i=1, #styles do
+			styles[i].offset[1], styles[i].offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, styles[i].angle, styles[i].size[2]/2, styles[i].size[1]/2, RIGHT_ANGLE)
+		end
+	end
+
+	Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
+end)
+
+-- local charge_up_templates = {
+-- 	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_charge_up_ads_new",
+-- 	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_charge_up_new"
+-- }
+-- for i=1, #charge_up_templates do
+-- 	charge_up_templates[i] = require(charge_up_templates[i])
+-- end
+
+-- for i=1, 1 do
+-- 	mod:hook(charge_up_templates[i], "create_widget_defintion", function (func, template, scenegraph_id)
+-- 		local widget = func(template, scenegraph_id)
+-- 		for k,v in pairs(widget.style) do
+-- 			if not string.find(k, "hit_") then
+-- 				v.offset[1], v.offset[2] = v.offset[1] * SCALAR, v.offset[2] * SCALAR
+-- 			end
+-- 		end
+-- 		return widget
+-- 	end)
+-- end
+
+mod:hook(Crosshair, "hit_indicator_segment", function (func, position_name)
+	local widget = func(position_name)
+	for k,v in pairs(widget) do
+		mod:echo(k)
+		mod:echo(v)
+	end
+	return widget
+end)
+
+mod:hook(Crosshair, "weakspot_hit_indicator_segment", function (func, position_name)
+	local widget = func(position_name)
+	for k,v in pairs(widget) do
+		mod:echo(k)
+		mod:echo(v)
+	end
+	return widget
+end)
+
 mod:hook(HudElementCrosshair, "init", function(func, self, parent, draw_layer, start_scale, definitions)
     func(self, parent, draw_layer, start_scale, definitions)
     local SCALAR = mod:get("crosshair_scalar")
     for k, v in pairs(self._crosshair_widget_definitions) do
-        for i, j in pairs(v.style) do
-            if j.size then
-                for i = 1, #j.size do
-                    j.size[i] = j.size[i] * SCALAR
-                end
-            end
-        end
+		if not (k == "charge_up_ads" or k == "charge_up") then
+			for i, j in pairs(v.style) do
+				if j.size then
+					for i = 1,2 do
+						j.size[i] = j.size[i] * SCALAR
+					end
+				end
+			end
+		end
     end
 end)
 
 mod:command("set_crosshair_scalar", mod:localize("crosshair_scalar_description"), function(s, ...)
     s = tonumber(s)
-    if s == nil or s < 0.01 or s > 8 then
+    if s == nil or s < 0.01 or s > 4 then
         mod:error("Invalid")
         return
     end

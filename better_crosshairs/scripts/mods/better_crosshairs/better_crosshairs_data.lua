@@ -10,7 +10,7 @@ return {
 				setting_id      = "crosshair_scalar",
 				type            = "numeric",
 				default_value   = 1,
-				range           = {0.01, 8},
+				range           = {0.01, 4},
 				decimals_number = 2,
 			},
 		},
