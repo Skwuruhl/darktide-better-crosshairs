@@ -353,7 +353,7 @@ for i=1, #hit_indicator_segments do
 			style.pivot = nil -- I still don't know what pivot does. seems to just break everything.
 		end
 		local offset = style.offset
-		offset[1], offset[2] = mod.crosshair_rotation(10, 10, style.angle, style.size[1], style.size[2])
+		offset[1], offset[2] = mod.crosshair_rotation(10, 10, style.angle, style.size[1]/2, style.size[2]/2)
 		offset[1], offset[2] = offset[1] * SCALAR, offset[2] * SCALAR
 		return widget
 	end)
