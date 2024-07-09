@@ -3,6 +3,7 @@ local fov = require("scripts/utilities/camera/fov")
 local assault_new = require("scripts/ui/hud/elements/crosshair/templates/crosshair_template_assault_new")
 local Crosshair = require("scripts/ui/utilities/crosshair")
 local HudElementCrosshairSettings = require("scripts/ui/hud/elements/crosshair/hud_element_crosshair_settings")
+local HudElementCrosshair = require("scripts/ui/hud/elements/crosshair/hud_element_crosshair")
 
 local SCALAR = mod:get("crosshair_scalar")
 mod.on_setting_changed = function(status, state_name)
@@ -105,6 +106,20 @@ for i=1, #HudElementCrosshairSettings.templates do
 		Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
 	end)
 end
+
+mod:hook(HudElementCrosshair, "init", function(func, self, parent, draw_layer, start_scale, definitions)
+    func(self, parent, draw_layer, start_scale, definitions)
+    local SCALAR = mod:get("crosshair_scalar")
+    for k, v in pairs(self._crosshair_widget_definitions) do
+        for i, j in pairs(v.style) do
+            if j.size then
+                for i = 1, #j.size do
+                    j.size[i] = j.size[i] * SCALAR
+                end
+            end
+        end
+    end
+end)
 
 mod:command("set_crosshair_scalar", mod:localize("crosshair_scalar_description"), function(s, ...)
     s = tonumber(s)
