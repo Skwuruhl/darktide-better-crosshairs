@@ -312,21 +312,11 @@ for i=1, #charge_up_templates do
 			}, scenegraph_id)
 		end)
 
+		--removed yaw and pitch variables since they were just wasting memory
 		mod:hook_origin(instance, "update_function", function (parent, ui_renderer, widget, template, crosshair_settings, dt, t, draw_hit_indicator)
 			local style = widget.style
 			local hit_progress, hit_color, hit_weakspot = parent:hit_indicator()
-			-- local yaw, pitch = parent:_spread_yaw_pitch(dt)
 			local charge_level = parent:_get_current_charge_level() or 0
-		
-			-- if yaw and pitch then
-			-- 	local scalar = SPREAD_DISTANCE * (crosshair_settings.spread_scalar or 1)
-			-- 	local spread_offset_y = pitch * scalar
-			-- 	local spread_offset_x = yaw * scalar
-			-- 	local charge_left_style = style.charge_left
-			-- 	local charge_mask_left_style = style.charge_mask_left
-			-- 	local charge_right_style = style.charge_right
-			-- 	local charge_mask_right_style = style.charge_mask_right
-			-- end
 		
 			local mask_height = MASK_SIZE[2] * SCALAR -- man charge_up templates are weird.
 			local mask_height_charged = mask_height * charge_level
