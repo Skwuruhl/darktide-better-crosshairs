@@ -1,8 +1,8 @@
 # Darktide Better Crosshairs
 
-Includes fixes from Crosshairs Fix. I initially intended for this to just be a customization mod but the scope necessitated combining the mods. Darktide 1.4 fixed most issues with crosshairs being inaccurate but a few critical issues remain. Mod fixes remaining issues. Better Crosshairs adds sliders for crosshair size and color. Painstaking effort has gone into ensuring that spread remains accurate even while crosshair size and FOV changes. Additionally the mod has a function that custom crosshairs and/or other mods can utilize to easily generate crosshair segments with accurate spread, especially for diagonal segments.
+Includes fixes from [Crosshairs Fix](https://github.com/Skwuruhl/darktide-crosshairs-fix). I initially intended for this to just be a customization mod but the scope necessitated combining the mods. Darktide 1.4 fixed most issues with crosshairs being inaccurate but a few critical issues remain. Mod fixes remaining issues. Better Crosshairs adds sliders for crosshair size and color. Painstaking effort has gone into ensuring that spread remains accurate even while crosshair size and FOV changes. Additionally the mod has a function that custom crosshairs and/or other mods can utilize to easily generate crosshair segments with accurate spread, especially for diagonal segments.
 
-[Nexus Mods](https://www.nexusmods.com/warhammer40kdarktide/mods/36)
+[Nexus Mods](https://www.nexusmods.com/warhammer40kdarktide/mods/338)
 
 # Installation
 
