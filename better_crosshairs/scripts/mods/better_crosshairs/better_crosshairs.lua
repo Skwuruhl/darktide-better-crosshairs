@@ -158,6 +158,10 @@ mod:hook_origin(flamer, "update_function", function (parent, ui_renderer, widget
 			styles[i].offset[1], styles[i].offset[2] = mod.crosshair_rotation(spread_offset_x, spread_offset_y, styles[i].angle, styles[i].size[2]/2, styles[i].size[1]/2, RIGHT_ANGLE)
 		end
 	end
+local fixed_wide_templates = {
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_flamer",
+	"scripts/ui/hud/elements/crosshair/templates/crosshair_template_shotgun_wide_new"
+}
 
 	Crosshair.update_hit_indicator(style, hit_progress, hit_color, hit_weakspot, draw_hit_indicator)
 end)
