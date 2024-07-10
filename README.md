@@ -14,7 +14,7 @@ Original crosshairs equation:
 
     370 * tan(spread) / tan(current_vertical_fov / 2)
 
-Result is the number of pixels your crosshair is placed from the center of the screen, scaled from 1080p as baseline. Assault is 555 instead of 370.
+Result is the number of pixels your crosshair is placed from the center of the screen, scaled from 1080p as baseline. Assault was 555 instead of 370.
 
 New equation:
 
